@@ -78,7 +78,9 @@ def load_file(filepath: str, read_byte: bool):
         with open(filepath, mode) as f:
             for line in f.readlines():
                 file_text += line
-        return [True, "".join(file_text)]
+        if not read_byte:
+            file_text = "".join(file_text)
+        return [True, file_text]
     except Exception as e:
         return [False, str(e)]
 
@@ -111,14 +113,17 @@ while event not in (sg.WIN_CLOSED, "Exit"):
         if not success:
             debug_text, debug_color = in_text, Config.FAIL_COLOR
 
-    # convert to uppercase alphabet
-    in_text = re.sub('[^A-Z]+', '', in_text.upper())
-    print(in_text)
+    if type(in_text) == str:
+        # convert to uppercase alphabet
+        in_text = re.sub('[^A-Z]+', '', in_text.upper())
+        print(in_text)
 
     # Process
     if event == "run":
         action = values["action"].lower()
         out_text = getattr(selected_cipher, action)(in_text, values["cipher_key"].upper())
+        if selected_cipher.allow_byte:
+            out_text = "".join([chr(x) for x in out_text])
         debug_text, debug_color = f"Succesfully {action}ed!", Config.SUCCESS_COLOR
     elif event == "export":
         filename = "out/" + values["filename"]

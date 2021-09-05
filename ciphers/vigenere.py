@@ -84,7 +84,8 @@ class ExtendedVigenereCipher(VigenereCipher):
 
     def encrypt(msg: str, key: str) -> str:
         key = ExtendedVigenereCipher.generate_key(msg, key)
-        return VigenereCipher._encrypt(msg, key)
+        print(msg, key)
+        return msg
 
     def decrypt(msg: str, key: str) -> str:
         key = ExtendedVigenereCipher.generate_key(msg, key)
