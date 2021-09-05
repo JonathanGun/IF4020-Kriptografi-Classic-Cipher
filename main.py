@@ -44,7 +44,7 @@ layout = [
                     [sg.T("Select File", size=(10, 1)), sg.FileBrowse("Choose a file", key="in_file", target=(sg.ThisRow, 2)), sg.T("", size=(40, 2))]
                 ], key="file"),
             ]], key="source")],
-            [sg.T("Select Cipher", size=(10, 1)), sg.DropDown(list(ciphers.keys()), key="method", default_value=list(ciphers.keys())[0])],
+            [sg.T("Select Cipher", size=(10, 1)), sg.DropDown(list(ciphers.keys()), key="method", default_value=list(ciphers.keys())[-1])],
             [sg.T("Cipher Key", size=(10, 1)), sg.In(key="cipher_key", size=(60, 1))],
             [sg.T("Action", size=(10, 1)), sg.DropDown(["Encrypt", "Decrypt"], key="action", default_value="Encrypt", size=(10, 1))],
             [sg.Button("Run", pad=(5, 10))],
@@ -118,7 +118,7 @@ while event not in (sg.WIN_CLOSED, "Exit"):
     # Process
     if event == "run":
         action = values["action"].lower()
-        out_text = getattr(selected_cipher, action)(in_text, values["cipher_key"])
+        out_text = getattr(selected_cipher, action)(in_text, values["cipher_key"].upper())
         debug_text, debug_color = f"Succesfully {action}ed!", Config.SUCCESS_COLOR
     elif event == "export":
         filename = "out/" + values["filename"]
@@ -135,7 +135,7 @@ while event not in (sg.WIN_CLOSED, "Exit"):
             debug_text, debug_color = "Output filename cannot be empty", Config.FAIL_COLOR
 
     # Output
-    if out_text:
+    if event == "run" and debug_color == Config.SUCCESS_COLOR:
         window["out_preview_no_space"].update(out_text)
         window["out_preview_spaced"].update(group(out_text, 5))
         window["output"].select()
