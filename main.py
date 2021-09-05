@@ -112,6 +112,9 @@ while event not in (sg.WIN_CLOSED, "Exit"):
         out_text = ""
         if not success:
             debug_text, debug_color = in_text, Config.FAIL_COLOR
+    else:
+        if selected_cipher.allow_byte:
+            in_text = [ord(x) for x in in_text]
 
     if type(in_text) == str:
         # convert to uppercase alphabet
