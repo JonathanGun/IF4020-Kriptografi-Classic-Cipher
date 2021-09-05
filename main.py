@@ -61,6 +61,12 @@ layout = [
             [sg.Button("Export", pad=(5, 10))],
         ], key="output"),
         sg.Tab("About", [
+            [sg.T("Pada affine dan hill cipher, pisahkan angka dengan koma, contoh:")],
+            [sg.T("Affine: 7,10 -> m: 7, b: 10")],
+            [sg.T("Hill: 17, 17, 5, 21, 18, 21, 2, 2, 19 -> terbentuk matriks 3x3, yaitu")],
+            [sg.T("| 17  17   5 |")],
+            [sg.T("| 21  18  21 |")],
+            [sg.T("|  2   2  19 |")],
             [sg.T("Created by:")],
             [sg.T("- Jonathan Yudi Gunawan / 13518084")],
             [sg.T("- Cisco Zulfikar / 13518073")],
