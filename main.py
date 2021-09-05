@@ -118,7 +118,7 @@ while event not in (sg.WIN_CLOSED, "Exit"):
     # Process
     if event == "run":
         action = values["action"].lower()
-        out_text = getattr(selected_cipher, action)(in_text)
+        out_text = getattr(selected_cipher, action)(in_text, values["cipher_key"])
         debug_text, debug_color = f"Succesfully {action}ed!", Config.SUCCESS_COLOR
     elif event == "export":
         filename = "out/" + values["filename"]
