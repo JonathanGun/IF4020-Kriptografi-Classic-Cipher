@@ -64,7 +64,7 @@ class AutoVigenereCipher(VigenereCipher):
 class FullVigenereCipher(VigenereCipher):
     def generate_key(string, key):
         # TODO
-        return VigenereCipher.generate_key(msg, key)
+        return VigenereCipher.generate_key(string, key)
 
     def encrypt(msg: str, key: str) -> str:
         key = FullVigenereCipher.generate_key(msg, key)
@@ -80,7 +80,7 @@ class ExtendedVigenereCipher(VigenereCipher):
 
     def generate_key(string, key):
         # TODO
-        return VigenereCipher.generate_key(msg, key)
+        return VigenereCipher.generate_key(string, key)
 
     def encrypt(msg: str, key: str) -> str:
         key = ExtendedVigenereCipher.generate_key(msg, key)
