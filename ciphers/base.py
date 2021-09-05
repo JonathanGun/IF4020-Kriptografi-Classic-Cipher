@@ -1,10 +1,17 @@
-class Cipher:
+from abc import ABC, abstractmethod
+
+
+class Cipher(ABC):
     allow_byte = False
 
-    @classmethod
-    def encrypt(msg: str, key: str) -> str:
-        return msg
+    def __init__(self, msg: str, key: str):
+        self.msg = msg
+        self.key = key
 
-    @classmethod
-    def decrypt(msg: str, key: str) -> str:
-        return msg
+    @abstractmethod
+    def encrypt(self) -> str:
+        pass
+
+    @abstractmethod
+    def decrypt(self) -> str:
+        pass

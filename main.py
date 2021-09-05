@@ -124,7 +124,7 @@ while event not in (sg.WIN_CLOSED, "Exit"):
     # Process
     if event == "run":
         action = values["action"].lower()
-        out_text = getattr(selected_cipher, action)(in_text, values["cipher_key"].upper())
+        out_text = getattr(selected_cipher(in_text, values["cipher_key"].upper()), action)()
         if selected_cipher.allow_byte:
             out_text = "".join([chr(x) for x in out_text])
         debug_text, debug_color = f"Succesfully {action}ed!", Config.SUCCESS_COLOR

@@ -16,21 +16,21 @@ class AffineCipher(Cipher):
         else:
             return x % m
 
-    def encrypt(msg: str, key: str) -> str:
-        m, b = map(int, key.split(","))
+    def encrypt(self) -> str:
+        m, b = map(int, self.key.split(","))
         ret = []
-        for p in msg:
+        for p in self.msg:
             c = (m * (ord(p) - ord('A')) + b) % 26
             c = chr(c + ord('A'))
             ret.append(c)
         return "".join(ret)
 
-    def decrypt(msg: str, key: str) -> str:
-        m, b = map(int, key.split(","))
+    def decrypt(self) -> str:
+        m, b = map(int, self.key.split(","))
         mod_m = AffineCipher.modinv(m, 26)
 
         ret = []
-        for c in msg:
+        for c in self.msg:
             p = (mod_m * (ord(c) - ord('A') - b)) % 26
             p = chr(p + ord('A'))
             ret.append(p)

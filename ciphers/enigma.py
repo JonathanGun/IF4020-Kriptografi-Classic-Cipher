@@ -2,10 +2,10 @@ from ciphers.base import Cipher
 
 
 class EnigmaCipher(Cipher):
-    def encrypt(msg: str, key: str) -> str:
+    def encrypt(self) -> str:
         # TODO
-        return msg + "ASD"
+        return self.msg + "ASD"
 
-    def decrypt(msg: str, key: str) -> str:
+    def decrypt(self) -> str:
         # TODO
-        return "ASD" + msg
+        return "ASD" + self.msg

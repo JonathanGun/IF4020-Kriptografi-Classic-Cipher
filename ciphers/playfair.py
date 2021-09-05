@@ -3,40 +3,24 @@ from typing import List
 from ciphers.base import Cipher
 
 
+def _split(string: str, n: int = 2) -> List[str]:
+    return [(string[i:i + n]) for i in range(0, len(string), n)]
+
+
+def _translate_coord_cyclic(r, c, dr, dc):
+    return (r + dr) % 5, (c + dc) % 5
+
+
 class PlayfairCipher(Cipher):
     REMOVED_CHAR = "J"
     REPLACE_CHAR = "I"
 
-    def _split(string: str, n: int = 2) -> List[str]:
-        return [(string[i:i + n]) for i in range(0, len(string), n)]
+    def __init__(self, msg: str, key: str):
+        self.key, self.key_dict = self.Key(key, self.REMOVED_CHAR).preprocess()
+        self.msg = msg.replace(self.REMOVED_CHAR, self.REPLACE_CHAR)
+        self.list_msg = self.__split_and_insert(self.msg, 'X')
 
-    def to_square(key: str) -> List[str]:
-        return PlayfairCipher._split(key, 5)
-
-    def remove_duplicates(key: str) -> str:
-        ret = ""
-        for c in key:
-            if c not in ret:
-                ret += c
-        return ret
-
-    def prepend_key(key: str) -> str:
-        for i in range(26):
-            c = chr(ord("A") + i)
-            if c == PlayfairCipher.REMOVED_CHAR:
-                continue
-            if c not in key:
-                key += c
-        return key
-
-    def to_dict(key: List[str]):
-        ret = {}
-        for i, line in enumerate(key):
-            for j, c in enumerate(line):
-                ret[c] = (i, j)
-        return ret
-
-    def split_and_insert(msg: str, ins_char: str = 'X') -> List[str]:
+    def __split_and_insert(self, msg: str, ins_char: str = 'X') -> List[str]:
         ret = []
         cur = ''
         last = ''
@@ -55,29 +39,59 @@ class PlayfairCipher(Cipher):
             ret.append(cur + ins_char)
         return ret
 
-    def preprocess_key(key: str) -> List[str]:
-        key = key.replace(PlayfairCipher.REMOVED_CHAR, "")
-        key = re.sub(r"\s+", '', key)
-        key = PlayfairCipher.remove_duplicates(key)
-        key = PlayfairCipher.prepend_key(key)
-        key = PlayfairCipher.to_square(key)
-        key_dict = PlayfairCipher.to_dict(key)
-        return (key, key_dict)
+    class Key:
+        def __init__(self, key: str, removed_char: str):
+            self.key = key
+            self.removed_char = removed_char
 
-    def preprocess_msg(msg: str, n: int = 2) -> List[str]:
-        msg = msg.replace(PlayfairCipher.REMOVED_CHAR, PlayfairCipher.REPLACE_CHAR)
-        msg = PlayfairCipher.split_and_insert(msg, 'X')
-        return msg
+        def preprocess(self):
+            self.remove_leftover_char().remove_whitespaces().remove_duplicates().prepend_key().to_square()
+            self.key_dict = self.to_dict()
+            return (self.key, self.key_dict)
 
-    def _translate_coord_cyclic(r, c, dr, dc):
-        return (r + dr) % 5, (c + dc) % 5
+        def remove_whitespaces(self):
+            self.key = re.sub(r"\s+", '', self.key)
+            return self
 
-    def _encrypt(list_msg: List[str], key: str) -> str:
-        key, key_dict = key
-        list_cip = []
-        for pair in list_msg:
-            r1, c1 = key_dict[pair[0]]
-            r2, c2 = key_dict[pair[1]]
+        def remove_leftover_char(self):
+            self.key = self.key.replace(self.removed_char, "")
+            return self
+
+        def to_square(self) -> List[str]:
+            self.key = _split(self.key, 5)
+            return self
+
+        def remove_duplicates(self) -> str:
+            ret = ""
+            for c in self.key:
+                if c not in ret:
+                    ret += c
+            self.key = ret
+            return self
+
+        def prepend_key(self) -> str:
+            ret = self.key
+            for i in range(26):
+                c = chr(ord("A") + i)
+                if c == self.removed_char:
+                    continue
+                if c not in ret:
+                    ret += c
+            self.key = ret
+            return self
+
+        def to_dict(self):
+            ret = {}
+            for i, line in enumerate(self.key):
+                for j, c in enumerate(line):
+                    ret[c] = (i, j)
+            return ret
+
+    def encrypt(self) -> str:
+        self.list_cip = []
+        for pair in self.list_msg:
+            r1, c1 = self.key_dict[pair[0]]
+            r2, c2 = self.key_dict[pair[1]]
             dr1, dc1 = 0, 0
             dr2, dc2 = 0, 0
             if r1 == r2:
@@ -86,19 +100,17 @@ class PlayfairCipher(Cipher):
                 dr1, dr2 = 1, 1
             else:
                 dc1, dc2 = c2 - c1, c1 - c2
-            cip1_r, cip1_c = PlayfairCipher._translate_coord_cyclic(r1, c1, dr1, dc1)
-            cip2_r, cip2_c = PlayfairCipher._translate_coord_cyclic(r2, c2, dr2, dc2)
-            cip1 = key[cip1_r][cip1_c]
-            cip2 = key[cip2_r][cip2_c]
-            list_cip.append(cip1 + cip2)
-        return "".join(list_cip)
+            cip1_r, cip1_c = _translate_coord_cyclic(r1, c1, dr1, dc1)
+            cip2_r, cip2_c = _translate_coord_cyclic(r2, c2, dr2, dc2)
+            cip1, cip2 = self.key[cip1_r][cip1_c], self.key[cip2_r][cip2_c]
+            self.list_cip.append(cip1 + cip2)
+        return "".join(self.list_cip)
 
-    def _decrypt(list_msg: List[str], key: str) -> str:
-        key, key_dict = key
-        list_cip = []
-        for pair in list_msg:
-            r1, c1 = key_dict[pair[0]]
-            r2, c2 = key_dict[pair[1]]
+    def decrypt(self) -> str:
+        self.list_cip = []
+        for pair in self.list_msg:
+            r1, c1 = self.key_dict[pair[0]]
+            r2, c2 = self.key_dict[pair[1]]
             dr1, dc1 = 0, 0
             dr2, dc2 = 0, 0
             if r1 == r2:
@@ -107,21 +119,8 @@ class PlayfairCipher(Cipher):
                 dr1, dr2 = -1, -1
             else:
                 dc1, dc2 = c2 - c1, c1 - c2
-            cip1_r, cip1_c = PlayfairCipher._translate_coord_cyclic(r1, c1, dr1, dc1)
-            cip2_r, cip2_c = PlayfairCipher._translate_coord_cyclic(r2, c2, dr2, dc2)
-            cip1 = key[cip1_r][cip1_c]
-            cip2 = key[cip2_r][cip2_c]
-            list_cip.append(cip1 + cip2)
-        return "".join(list_cip)
-
-    def encrypt(msg: str, key: str) -> str:
-        key = PlayfairCipher.preprocess_key(key)
-        list_msg = PlayfairCipher.preprocess_msg(msg)
-        ret = PlayfairCipher._encrypt(list_msg, key)
-        return ret
-
-    def decrypt(msg: str, key: str) -> str:
-        key = PlayfairCipher.preprocess_key(key)
-        list_msg = PlayfairCipher._split(msg, 2)
-        ret = PlayfairCipher._decrypt(list_msg, key)
-        return ret
+            cip1_r, cip1_c = _translate_coord_cyclic(r1, c1, dr1, dc1)
+            cip2_r, cip2_c = _translate_coord_cyclic(r2, c2, dr2, dc2)
+            cip1, cip2 = self.key[cip1_r][cip1_c], self.key[cip2_r][cip2_c]
+            self.list_cip.append(cip1 + cip2)
+        return "".join(self.list_cip)
