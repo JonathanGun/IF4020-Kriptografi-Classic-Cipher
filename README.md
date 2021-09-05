@@ -16,7 +16,14 @@ python -m pip install -r requirements.txt
 ```
 
 ## Running Program
+### Linux
 ```bash
-cd src
+source venv/bin/activate
+python main.py
+```
+
+### Windows
+```bash
+venv\Scripts\activate
 python main.py
 ```

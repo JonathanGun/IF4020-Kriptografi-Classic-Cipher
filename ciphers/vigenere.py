@@ -32,6 +32,8 @@ class FullVigenereCipher(VigenereCipher):
 
 
 class ExtendedVigenereCipher(VigenereCipher):
+    allow_byte = True
+
     def encrypt(msg: str) -> str:
         # TODO
         return msg + "ASDdsa1"
