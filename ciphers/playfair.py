@@ -39,15 +39,18 @@ class PlayfairCipher(Cipher):
     def split_and_insert(msg: str, ins_char: str = 'X') -> List[str]:
         ret = []
         cur = ''
+        last = ''
         for c in msg:
-            if c == cur:
-                ret.append(cur + ins_char)
-                cur = c
-            elif len(cur) == 1:
-                ret.append(cur + c)
+            if c == last:
+                cur += ins_char
+            if len(cur) == 2:
+                ret.append(cur)
                 cur = ''
-            else:
-                cur = c
+            cur += c
+            if len(cur) == 2:
+                ret.append(cur)
+                cur = ''
+            last = c
         if cur:
             ret.append(cur + ins_char)
         return ret
@@ -82,7 +85,7 @@ class PlayfairCipher(Cipher):
             elif c1 == c2:
                 dr1, dr2 = 1, 1
             else:
-                dc1, dc2 = c1 - c2, c1 - c2
+                dc1, dc2 = c2 - c1, c1 - c2
             cip1_r, cip1_c = PlayfairCipher._translate_coord_cyclic(r1, c1, dr1, dc1)
             cip2_r, cip2_c = PlayfairCipher._translate_coord_cyclic(r2, c2, dr2, dc2)
             cip1 = key[cip1_r][cip1_c]
@@ -104,7 +107,6 @@ class PlayfairCipher(Cipher):
                 dr1, dr2 = -1, -1
             else:
                 dc1, dc2 = c2 - c1, c1 - c2
-            print(dr1, dc1, dr2, dc2)
             cip1_r, cip1_c = PlayfairCipher._translate_coord_cyclic(r1, c1, dr1, dc1)
             cip2_r, cip2_c = PlayfairCipher._translate_coord_cyclic(r2, c2, dr2, dc2)
             cip1 = key[cip1_r][cip1_c]
