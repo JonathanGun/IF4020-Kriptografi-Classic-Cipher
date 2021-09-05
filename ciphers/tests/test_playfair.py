@@ -1,9 +1,9 @@
 from ciphers.playfair import PlayfairCipher
 
 
-def test_simple():
-    plaintext = "TEMUIIBUNANTIMALAM"
-    key = "JALAN GANESHA SEPULUH"
-    ciphertext = PlayfairCipher.encrypt(plaintext, key)
+def test_sample():
+    plaintext = "temui ibu nanti malam"
+    key = "jalan ganesha sepuluh"
+    ciphertext = PlayfairCipher(plaintext, key).encrypt()
     expected = "ZBRSFYKUPGLGRKVSNLQV"
     assert ciphertext == expected

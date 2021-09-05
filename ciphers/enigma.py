@@ -4,8 +4,8 @@ from ciphers.base import Cipher
 class EnigmaCipher(Cipher):
     def encrypt(self) -> str:
         # TODO
-        return self.msg + "ASD"
+        return self.msg
 
     def decrypt(self) -> str:
         # TODO
-        return "ASD" + self.msg
+        return self.msg

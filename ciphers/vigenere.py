@@ -1,7 +1,12 @@
+import re
 from ciphers.base import Cipher
 
 
 class VigenereCipher(Cipher):
+    def __init__(self, msg: str, key: str):
+        super().__init__(msg, key)
+        self.key = re.sub('[^A-Z]+', '', self.key.upper())
+
     def preprocess_key(self):
         n = len(self.msg) - len(self.key)
         for i in range(n):
@@ -52,6 +57,18 @@ class FullVigenereCipher(VigenereCipher):
 class ExtendedVigenereCipher(VigenereCipher):
     allow_byte = True
 
+    def __init__(self, msg: str, key: str):
+        self.msg = [ord(x) for x in msg.upper()]
+        self.key = key.upper()
+
     def preprocess_key(self):
         # TODO
         return super().preprocess_key()
+
+    def decrypt(self) -> str:
+        # TODO
+        return "".join([chr(x) for x in self.msg])
+
+    def encrypt(self) -> str:
+        # TODO
+        return "".join([chr(x) for x in self.msg])

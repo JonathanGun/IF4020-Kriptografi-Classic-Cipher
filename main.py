@@ -1,4 +1,3 @@
-import re
 import PySimpleGUI as sg
 
 from ciphers.vigenere import VigenereCipher, FullVigenereCipher, AutoVigenereCipher, ExtendedVigenereCipher
@@ -112,20 +111,12 @@ while event not in (sg.WIN_CLOSED, "Exit"):
         out_text = ""
         if not success:
             debug_text, debug_color = in_text, Config.FAIL_COLOR
-    else:
-        if selected_cipher.allow_byte:
-            in_text = [ord(x) for x in in_text]
-
-    if type(in_text) == str:
-        # convert to uppercase alphabet
-        in_text = re.sub('[^A-Z]+', '', in_text.upper())
-        print(in_text)
 
     # Process
     if event == "run":
         action = values["action"].lower()
-        out_text = getattr(selected_cipher(in_text, values["cipher_key"].upper()), action)()
-        if selected_cipher.allow_byte:
+        out_text = getattr(selected_cipher(in_text, values["cipher_key"]), action)()
+        if type(out_text) == list:
             out_text = "".join([chr(x) for x in out_text])
         debug_text, debug_color = f"Succesfully {action}ed!", Config.SUCCESS_COLOR
     elif event == "export":

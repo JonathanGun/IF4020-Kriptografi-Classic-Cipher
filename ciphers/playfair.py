@@ -16,8 +16,9 @@ class PlayfairCipher(Cipher):
     REPLACE_CHAR = "I"
 
     def __init__(self, msg: str, key: str):
-        self.key, self.key_dict = self.Key(key, self.REMOVED_CHAR).preprocess()
-        self.msg = msg.replace(self.REMOVED_CHAR, self.REPLACE_CHAR)
+        super().__init__(msg, key)
+        self.key, self.key_dict = self.Key(self.key, self.REMOVED_CHAR).preprocess()
+        self.msg = self.msg.replace(self.REMOVED_CHAR, self.REPLACE_CHAR)
         self.list_msg = self.__split_and_insert(self.msg, 'X')
 
     def __split_and_insert(self, msg: str, ins_char: str = 'X') -> List[str]:
