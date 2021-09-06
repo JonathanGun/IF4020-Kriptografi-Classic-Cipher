@@ -63,7 +63,7 @@ class ExtendedVigenereCipher(VigenereCipher):
     def __init__(self, msg: str, key: str):
         self.msg = msg
         if type(self.msg) != list:
-            self.msg = [ord(x) for x in self.msg.upper()]
+            self.msg = [ord(x) for x in self.msg]
         self.key = key.upper()
 
     def decrypt(self) -> str:
