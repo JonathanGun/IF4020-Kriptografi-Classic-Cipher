@@ -1,5 +1,7 @@
 # Kriptografi Tucil 1
 
+You can download the executables via this [link](https://github.com/JonathanGun/IF4020-Kriptografi-Classic-Cipher/releases/latest)
+
 ## Installing Requirements
 ### Linux
 ```bash
@@ -26,4 +28,9 @@ python main.py
 ```bash
 venv\Scripts\activate
 python main.py
+```
+
+## Building Exe
+```bash
+pyinstaller -F -i="icon.ico" main.py --clean -w
 ```
