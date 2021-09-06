@@ -1,3 +1,4 @@
+import os
 import PySimpleGUI as sg
 
 from ciphers.vigenere import VigenereCipher, FullVigenereCipher, AutoVigenereCipher, ExtendedVigenereCipher
@@ -93,10 +94,12 @@ def load_file(filepath: str, read_byte: bool):
 def write_file(filepath: str, content: str, write_byte: bool) -> bool:
     try:
         mode = "wb" if write_byte else "w"
+        content = bytes(content) if write_byte else content
         with open(filepath, mode) as f:
             f.write(content)
         return True
-    except Exception:
+    except Exception as e:
+        print(e)
         return False
 
 
@@ -109,28 +112,37 @@ while event not in (sg.WIN_CLOSED, "Exit"):
     debug_text, debug_color = "", None
     print(event, values)
 
-    # Read input
     selected_cipher = ciphers[values["method"]]
-    in_text = values["in_text"]
-    if values["source"] == "file":
-        success, in_text = load_file(values["in_file"], read_byte=selected_cipher.allow_byte)
-        out_text = ""
-        if not success:
-            debug_text, debug_color = in_text, Config.FAIL_COLOR
 
-    # Process
     if event == "run":
+        # Read input
+        in_text = values["in_text"]
         action = values["action"].lower()
-        out_text = getattr(selected_cipher(in_text, values["cipher_key"]), action)()
-        if type(out_text) == list:
-            out_text = "".join([chr(x) for x in out_text])
+        if values["source"] == "file":
+            success, in_text = load_file(values["in_file"], read_byte=selected_cipher.allow_byte)
+            window["filename"].update(os.path.basename(values["in_file"]) + "." + action[:3])
+            out_text = ""
+            if not success:
+                debug_text, debug_color = in_text, Config.FAIL_COLOR
+
+        # Procedd (decrypt / encrypt)
+        raw_out_text = getattr(selected_cipher(in_text, values["cipher_key"]), action)()
+        out_text = raw_out_text
+        if type(raw_out_text) == list:
+            try:
+                out_text = "".join([chr(x) for x in out_text])
+            except Exception:
+                out_text = ""
         debug_text, debug_color = f"Succesfully {action}ed!", Config.SUCCESS_COLOR
+
     elif event == "export":
         filename = "out/" + values["filename"]
         if values["filename"]:
+            to_write = out_text if values["out_type"] == "spaced" else group(out_text, 5)
             if not selected_cipher.allow_byte:
                 filename += '.txt'
-            to_write = out_text if values["out_type"] == "spaced" else group(out_text, 5)
+            else:
+                to_write = raw_out_text
             success = write_file(filename, to_write, selected_cipher.allow_byte)
             if not success:
                 debug_text, debug_color = f"Failed to save as {filename}", Config.FAIL_COLOR

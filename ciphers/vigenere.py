@@ -57,20 +57,27 @@ class FullVigenereCipher(VigenereCipher):
 class ExtendedVigenereCipher(VigenereCipher):
     allow_byte = True
 
+    def byte_to_str(msg):
+        return "".join([chr(x) for x in msg])
+
     def __init__(self, msg: str, key: str):
-        self.msg = [ord(x) for x in msg.upper()]
+        self.msg = msg
+        if type(self.msg) != list:
+            self.msg = [ord(x) for x in self.msg.upper()]
         self.key = key.upper()
 
     def decrypt(self) -> str:
+        self.preprocess_key()
         plain_text = []
         for i in range(len(self.msg)):
             x = ((self.msg[i]) - ord(self.key[i]) + 256) % 256
             plain_text.append(x)
-        return "".join([chr(x) for x in plain_text])
+        return plain_text
 
     def encrypt(self) -> str:
+        self.preprocess_key()
         cipher_text = []
         for i in range(len(self.msg)):
             x = ((self.msg[i]) + ord(self.key[i])) % 256
             cipher_text.append(x)
-        return "".join([chr(x) for x in cipher_text])
+        return cipher_text
