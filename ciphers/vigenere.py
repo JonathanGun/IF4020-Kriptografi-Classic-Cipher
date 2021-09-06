@@ -61,14 +61,16 @@ class ExtendedVigenereCipher(VigenereCipher):
         self.msg = [ord(x) for x in msg.upper()]
         self.key = key.upper()
 
-    def preprocess_key(self):
-        # TODO
-        return super().preprocess_key()
-
     def decrypt(self) -> str:
-        # TODO
-        return "".join([chr(x) for x in self.msg])
+        plain_text = []
+        for i in range(len(self.msg)):
+            x = ((self.msg[i]) - ord(self.key[i]) + 256) % 256
+            plain_text.append(x)
+        return "".join([chr(x) for x in plain_text])
 
     def encrypt(self) -> str:
-        # TODO
-        return "".join([chr(x) for x in self.msg])
+        cipher_text = []
+        for i in range(len(self.msg)):
+            x = ((self.msg[i]) + ord(self.key[i])) % 256
+            cipher_text.append(x)
+        return "".join([chr(x) for x in cipher_text])
