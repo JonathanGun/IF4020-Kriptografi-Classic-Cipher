@@ -8,12 +8,12 @@ class VigenereCipher(Cipher):
     def __init__(self, msg: str, key: str):
         super().__init__(msg, key)
         self.key = re.sub('[^A-Z]+', '', self.key.upper())
+        self.preprocess_key()
 
     def preprocess_key(self):
         n = len(self.msg) - len(self.key)
         for i in range(n):
             self.key += self.key[i % len(self.key)]
-        print(self.key)
 
     def _encrypt_single(self, m, k):
         return chr((ord(m) + ord(k)) % 26 + ord("A"))
@@ -22,7 +22,6 @@ class VigenereCipher(Cipher):
         return chr((ord(m) - ord(k)) % 26 + ord("A"))
 
     def encrypt(self) -> str:
-        self.preprocess_key()
         cipher_text = []
         for i in range(len(self.msg)):
             cipher_text.append(self._encrypt_single(self.msg[i], self.key[i]))
@@ -30,12 +29,30 @@ class VigenereCipher(Cipher):
         return cipher_text
 
     def decrypt(self) -> str:
-        self.preprocess_key()
         plain_text = []
         for i in range(len(self.msg)):
             plain_text.append(self._decrypt_single(self.msg[i], self.key[i]))
         plain_text = plain_text if self.allow_byte else "".join(plain_text)
         return plain_text
+
+
+class FullVigenereCipher(VigenereCipher):
+    def __init__(self, msg: str, key: str):
+        super().__init__(msg, key)
+        self.generate_lookup_key()
+
+    def generate_lookup_key(self):
+        random.seed(self.key)
+        uppercase = list(string.ascii_uppercase)
+        self.lookup_key = []
+        for _ in range(26):
+            self.lookup_key.append(random.sample(uppercase, 26))
+
+    def _encrypt_single(self, m, k):
+        return self.lookup_key[ord(k) - ord("A")][ord(m) - ord("A")]
+
+    def _decrypt_single(self, m, k):
+        return chr(self.lookup_key[ord(k) - ord("A")].index(m) + ord("A"))
 
 
 class AutoVigenereCipher(VigenereCipher):
@@ -51,27 +68,6 @@ class AutoVigenereCipher(VigenereCipher):
             x = self._decrypt_single(self.msg[i], self.key[i])
             self.key += x
         return self.key[k:]
-
-
-class FullVigenereCipher(VigenereCipher):
-    def __init__(self, msg: str, key: str):
-        super().__init__(msg, key)
-        self.generate_lookup_key()
-
-    def generate_lookup_key(self):
-        random.seed(self.key)
-        uppercase = list(string.ascii_uppercase)
-        self.lookup_key = []
-        for _ in range(26):
-            self.lookup_key.append(random.sample(uppercase, 26))
-        for k in self.lookup_key:
-            print("".join(k))
-
-    def _encrypt_single(self, m, k):
-        return self.lookup_key[ord(k) - ord("A")][ord(m) - ord("A")]
-
-    def _decrypt_single(self, m, k):
-        return chr(self.lookup_key[ord(k) - ord("A")].index(m) + ord("A"))
 
 
 class ExtendedVigenereCipher(VigenereCipher):

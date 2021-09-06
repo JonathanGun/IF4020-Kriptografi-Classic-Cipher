@@ -18,22 +18,19 @@ def modinv(a, m):
 
 
 class AffineCipher(Cipher):
+    def _encrypt_single(self, p, m, b):
+        return chr((m * (ord(p) - ord('A')) + b) % 26 + ord("A"))
+
+    def _decrypt_single(self, c, mod_m, b):
+        return chr((mod_m * (ord(c) - ord('A') - b)) % 26 + ord("A"))
+
     def encrypt(self) -> str:
         m, b = map(int, self.key.split(","))
-        ret = []
-        for p in self.msg:
-            c = (m * (ord(p) - ord('A')) + b) % 26
-            c = chr(c + ord('A'))
-            ret.append(c)
+        ret = [self._encrypt_single(p, m, b) for p in self.msg]
         return "".join(ret)
 
     def decrypt(self) -> str:
         m, b = map(int, self.key.split(","))
         mod_m = modinv(m, 26)
-
-        ret = []
-        for c in self.msg:
-            p = (mod_m * (ord(c) - ord('A') - b)) % 26
-            p = chr(p + ord('A'))
-            ret.append(p)
+        ret = [self._decrypt_single(c, mod_m, b) for c in self.msg]
         return "".join(ret)

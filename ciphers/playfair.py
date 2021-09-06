@@ -88,7 +88,7 @@ class PlayfairCipher(Cipher):
                     ret[c] = (i, j)
             return ret
 
-    def encrypt(self) -> str:
+    def encrypt_decrypt_helper(self, is_encrypt) -> str:
         self.list_cip = []
         for pair in self.list_msg:
             r1, c1 = self.key_dict[pair[0]]
@@ -96,9 +96,9 @@ class PlayfairCipher(Cipher):
             dr1, dc1 = 0, 0
             dr2, dc2 = 0, 0
             if r1 == r2:
-                dc1, dc2 = 1, 1
+                dc1 = dc2 = 1 if is_encrypt else -1
             elif c1 == c2:
-                dr1, dr2 = 1, 1
+                dr1 = dr2 = 1 if is_encrypt else -1
             else:
                 dc1, dc2 = c2 - c1, c1 - c2
             cip1_r, cip1_c = _translate_coord_cyclic(r1, c1, dr1, dc1)
@@ -107,21 +107,8 @@ class PlayfairCipher(Cipher):
             self.list_cip.append(cip1 + cip2)
         return "".join(self.list_cip)
 
+    def encrypt(self) -> str:
+        return self.encrypt_decrypt_helper(is_encrypt=True)
+
     def decrypt(self) -> str:
-        self.list_cip = []
-        for pair in self.list_msg:
-            r1, c1 = self.key_dict[pair[0]]
-            r2, c2 = self.key_dict[pair[1]]
-            dr1, dc1 = 0, 0
-            dr2, dc2 = 0, 0
-            if r1 == r2:
-                dc1, dc2 = -1, -1
-            elif c1 == c2:
-                dr1, dr2 = -1, -1
-            else:
-                dc1, dc2 = c2 - c1, c1 - c2
-            cip1_r, cip1_c = _translate_coord_cyclic(r1, c1, dr1, dc1)
-            cip2_r, cip2_c = _translate_coord_cyclic(r2, c2, dr2, dc2)
-            cip1, cip2 = self.key[cip1_r][cip1_c], self.key[cip2_r][cip2_c]
-            self.list_cip.append(cip1 + cip2)
-        return "".join(self.list_cip)
+        return self.encrypt_decrypt_helper(is_encrypt=False)
