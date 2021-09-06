@@ -17,12 +17,13 @@ ciphers = {
 
 
 def test_decrypt_encrypt():
-    plaintext = "temui ibu nanti malam"
+    plaintext = "paymoremoney"
     key = ""
     key_default = "jalan ganesha sepuluh"
     key_affine = "7, 10"
+    key_hill = "17, 17, 5, 21, 18, 21, 2, 2, 19"
     for cipher in ciphers.values():
-        key = key_affine if cipher == AffineCipher else key_default
+        key = key_hill if cipher == HillCipher else key_affine if cipher == AffineCipher else key_default
         print(cipher)
         print("p1:", plaintext)
 

@@ -7,3 +7,4 @@ def test_sample():
     ciphertext = HillCipher(plaintext, key).encrypt()
     expected = "LNSHDLEWMTRW"
     assert ciphertext == expected
+    # assert HillCipher(expected, key).decrypt() == plaintext.upper()

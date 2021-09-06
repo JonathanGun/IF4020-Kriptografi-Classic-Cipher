@@ -1,1 +1,4 @@
 pysimplegui==4.47.0
+numpy==1.21.2
+sympy==1.8
+pytest==6.2.5
